@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: myapp
-          image: myapp:latest
-          imagePullPolicy: Never
+          image: __IMAGE__
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
               protocol: TCP
