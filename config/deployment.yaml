@@ -15,9 +15,25 @@ spec:
         app: myapp
     spec:
       containers:
-        - name: myapp
-          image: __IMAGE__
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 3000
-              protocol: TCP
+      - name: myapp
+        image: __IMAGE__
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http-server
+          containerPort: 3000
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  labels:
+    app: myapp
+spec:
+  ports:
+  - port: 3000
+    targetPort: http-server
+  selector:
+    app: myapp
+  type: NodePort
