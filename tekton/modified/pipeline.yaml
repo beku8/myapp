@@ -1,0 +1,34 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: myapp-pipeline
+spec:
+  params:
+    - name: BUILDER_IMAGE
+      description: The image on which builds will run
+      default: gcr.io/jx-demo-297307/myapp:v1
+  resources:
+    - name: source
+      type: git
+  tasks:
+    - name: build
+      taskRef:
+        name: build-myapp
+      params:
+        - name: BUILDER_IMAGE
+          value: $(params.BUILDER_IMAGE)
+      resources:
+        inputs:
+          - name: source
+            resource: source
+    - name: deploy
+      runAfter: [build]
+      taskRef:
+        name: deploy-myapp
+      params:
+        - name: BUILDER_IMAGE
+          value: $(params.BUILDER_IMAGE)
+      resources:
+        inputs:
+          - name: source
+            resource: source

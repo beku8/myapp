@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-myapp
+spec:
+  resources:
+    inputs:
+    - name: source
+      type: git
+  params:
+  - name: BUILDER_IMAGE
+    description: Path to the directory for kubectl apply -f
+    default: gcr.io/jx-demo-297307/myapp:v1
+  steps:
+  - name: update-yaml
+    image: alpine
+    workingDir: /workspace/source
+    command: ["sed"]
+    args:
+      - -i
+      - -e
+      - s;__IMAGE__;$(params.BUILDER_IMAGE);g
+      - "config/deployment.yaml"
+  - name: apply-config
+    image: lachlanevenson/k8s-kubectl
+    workingDir: /workspace/source
+    command: ['kubectl']
+    args:
+    - apply
+    - -f
+    - "config/deployment.yaml"
